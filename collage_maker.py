@@ -88,6 +88,7 @@ def main():
     # prepare argument parser
     parse = argparse.ArgumentParser(description='Photo collage maker')
     parse.add_argument('-f', '--folder', dest='folder', help='folder with images (*.jpg, *.jpeg, *.png)', default='.')
+    parse.add_argument('-F', '--file', dest='file', help='file with newline separated list of files', default='.')
     parse.add_argument('-o', '--output', dest='output', help='output collage image filename', default='collage.png')
     parse.add_argument('-w', '--width', dest='width', type=int, help='resulting collage image width')
     parse.add_argument('-i', '--init_height', dest='init_height', type=int, help='initial height for resize the images')
@@ -100,11 +101,16 @@ def main():
 
     # get images
     images = []
-    for root, dirs, files in os.walk(args.folder):
-        for name in files:
-            if re.findall("jpg|png|jpeg", name.split(".")[-1]):
-                fname = os.path.join(root, name)
-                images.append(fname)
+    if args.file:
+        with open(args.file, 'r') as f:
+            for line in f:
+                images.append(line.strip())
+    elif args.folder:
+        for root, dirs, files in os.walk(args.folder):
+            for name in files:
+                if re.findall("jpg|png|jpeg", name.split(".")[-1]):
+                    fname = os.path.join(root, name)
+                    images.append(fname)
     if not images:
         print('No images for making collage! Please select other directory with images!')
         exit(1)
